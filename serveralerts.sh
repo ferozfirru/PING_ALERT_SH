@@ -68,13 +68,13 @@ while true
 do
 chk=0
 
-sta="$(curl -A "alerts" --connect-timeout 6 -o /dev/null --silent --head --write-out '%{http_code}' "$ct")"
+sta="$(curl -A "alerts" --connect-timeout 6 -o /dev/null --silent --head --write-out '%{http_code}' "$google")"
 if (( $sta != 200 && $sct != 1 ))
 then
 cdt="$(date)"
 ctd2=$(date)
 mail -S from=alerts@server.com -s "󾭥 google.com : $sta (${hts[$sta]}) " "$mails" << END_MAIL
-"$ct" is responded with status code : "$sta" on "$cdt"
+"$google" is responded with status code : "$sta" on "$cdt"
 END_MAIL
 chk=1
 sct=1
@@ -89,7 +89,7 @@ else
 ctres="$(( $ctop / 60 )) min(s)"
 fi
 mail -S from=alerts@server.com -s "󾭦 google.com is UP : $sta (${hts[$sta]}) ($ctres)" "$mails" << END_MAIL
-"$ct" is Fine : "$(date)"
+"$google" is Fine : "$(date)"
 END_MAIL
 sct=0
 ctd2=""
