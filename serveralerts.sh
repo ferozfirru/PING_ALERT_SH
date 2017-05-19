@@ -66,37 +66,42 @@ mails="youremail@server.com"
 sct=0
 while true
 do
-chk=0
+	chk=0
 
-sta="$(curl -A "alerts" --connect-timeout 6 -o /dev/null --silent --head --write-out '%{http_code}' "$google")"
-if (( $sta != 200 && $sct != 1 ))
-then
-cdt="$(date)"
-ctd2=$(date)
-mail -S from=alerts@server.com -s "󾭥 google.com : $sta (${hts[$sta]}) " "$mails" << END_MAIL
-"$google" is responded with status code : "$sta" on "$cdt"
-END_MAIL
-chk=1
-sct=1
-elif (( $sct == 1  &&  $sta == 200 ))
-then
+	sta="$(curl -A "alerts" --connect-timeout 6 -o /dev/null --silent --head --write-out '%{http_code}' "$google")"
+	if (( $sta != 200 && $sct != 1 ))
+	then
+		cdt="$(date)"
+		ctd2=$(date)
+		mail -S from=alerts@server.com -s "󾭥 google.com : $sta (${hts[$sta]}) " "$mails" << END_MAIL
+		"$google" is responded with status code : "$sta" on "$cdt"
+	END_MAIL
 
-ctd1=$(date)
-ctop=$(( ( $(date -ud "$ctd1" +'%s') - $(date -ud "$ctd2" +'%s') ) ))
-if [[ "$ctop" -lt "60" ]]; then
-ctres="$ctop second(s)"
-else
-ctres="$(( $ctop / 60 )) min(s)"
-fi
-mail -S from=alerts@server.com -s "󾭦 google.com is UP : $sta (${hts[$sta]}) ($ctres)" "$mails" << END_MAIL
-"$google" is Fine : "$(date)"
-END_MAIL
-sct=0
-ctd2=""
-ctres=""
-else
-    r=1
-fi
+	chk=1
+	sct=1
 
-sleep 1
+	elif (( $sct == 1  &&  $sta == 200 ))
+	then
+		ctd1=$(date)
+		ctop=$(( ( $(date -ud "$ctd1" +'%s') - $(date -ud "$ctd2" +'%s') ) ))
+		
+		if [[ "$ctop" -lt "60" ]]; then
+			ctres="$ctop second(s)"
+		else
+			ctres="$(( $ctop / 60 )) min(s)"
+		fi
+		
+		mail -S from=alerts@server.com -s "󾭦 google.com is UP : $sta (${hts[$sta]}) ($ctres)" "$mails" << END_MAIL
+		"$google" is Fine : "$(date)"
+
+	END_MAIL
+
+	sct=0
+	ctd2=""
+	ctres=""
+	else
+	    r=1
+	fi
+
+	sleep 1
 done
